@@ -1,3 +1,5 @@
+#ifndef HELPERS_H
+#define HELPERS_H
 // TODO go over code, refine it, remove includes, etc...
 
 #include <linux/linkage.h>
@@ -215,4 +217,4 @@ void fh_remove_hooks(struct ftrace_hook* hooks, size_t count)
         fh_remove_hook(&hooks[i]);
 }
 
-
+#endif // MY_HEADER_H
