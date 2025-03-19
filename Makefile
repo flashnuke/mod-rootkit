@@ -8,6 +8,7 @@ kprobe_inject-objs := src/kprobe_inject.o \
                       src/utils/string_utils.o
 
 EXTRA_CFLAGS += -I$(PWD)/include -DEXCLUDES="\"SENSITIVE\""
+#EXTRA_CFLAGS += -DHIDE_MODULE
 
 all:
 	$(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
