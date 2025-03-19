@@ -8,7 +8,7 @@ int is_excluded(const char *entry) {
     char *temp_excludes = excludes; // `strsep` modifies the original string
 
     while ((token = strsep(&temp_excludes, ",")) != NULL) {
-        if (strcmp(entry, token) == 0) {
+        if (strstr(entry, token)) {
             return 1;
         }
     }

