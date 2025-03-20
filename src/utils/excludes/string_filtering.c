@@ -1,9 +1,9 @@
 #include <linux/string.h>
 
-#include "utils/string_utils.h"
+#include "utils/excludes/string_filtering.h"
 
-int is_excluded(const char *entry) {
-    char excludes[] = EXCLUDES; // Copy to a mutable array
+int str_entry_is_excluded(const char *entry) {
+    char excludes[] = STRING_EXCLUDES; // copy to a mutable array
     char *token;
     char *temp_excludes = excludes; // `strsep` modifies the original string
 
@@ -15,7 +15,7 @@ int is_excluded(const char *entry) {
     return 0;
 }
 
-// Function to check if a string contains only numeric characters
+// function to check if a string contains only numeric characters
 bool is_numeric(const char *str) {
     int i;
     if (!str || !str[0])
