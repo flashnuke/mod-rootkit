@@ -32,7 +32,7 @@ Demo - before and after loading the module:
 ## Requirements
 
 - Linux system with kernel headers installed
-- GCC and make
+- GCC, make and kernel headers: `sudo apt update && sudo apt install -y build-essential linux-headers-$(uname -r) make gcc`
 - Root permissions
 - Kernel version - should work on any
 
