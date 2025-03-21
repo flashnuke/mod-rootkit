@@ -7,16 +7,14 @@
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,17,0)
 asmlinkage long (*orig_read)(unsigned int fd, char __user *buf, size_t count);
 
-asmlinkage long hook_read(unsigned int fd, char __user *buf, size_t count)
-{
+asmlinkage long hook_read(unsigned int fd, char __user *buf, size_t count) {
     long ret = orig_read(fd, buf, count);
     return hook_read_impl(fd, buf, ret);
 }
 #else
 asmlinkage long (*orig_read)(const struct pt_regs *regs);
 
-asmlinkage int hook_read(const struct pt_regs *regs)
-{
+asmlinkage int hook_read(const struct pt_regs *regs) {
     unsigned int fd = regs->di;
     char __user *buf = (char __user *)regs->si;
     long ret = orig_read(regs);
@@ -25,8 +23,7 @@ asmlinkage int hook_read(const struct pt_regs *regs)
 #endif
 
 
-long hook_read_impl(unsigned int fd, char __user *buf, long ret)
-{
+long hook_read_impl(unsigned int fd, char __user *buf, long ret) {
     ssize_t ret2 = ret;
     struct file *f = fget(fd);
 
