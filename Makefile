@@ -2,7 +2,6 @@ obj-m += kprobe_inject.o
 kprobe_inject-objs := src/kprobe_inject.o \
                       src/hooks/x64_sys_getdents.o \
                       src/hooks/x64_sys_read.o \
-                      src/hooks/x64_sys_kill.o \
                       src/utils/ftrace_utils.o \
                       src/utils/kprobe_utils.o \
                       src/utils/proc_utils.o \
