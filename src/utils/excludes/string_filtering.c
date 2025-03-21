@@ -4,8 +4,12 @@
 
 #include "utils/excludes/string_filtering.h"
 
+int strings_exclusions_are_empty() {
+    return STRING_EXCLUDES[0] == '\0';
+}
+
 int str_entry_is_excluded(const char *entry) {
-    if (STRING_EXCLUDES[0] == '\0') { // no string excludes are set
+    if (strings_exclusions_are_empty()) { // no string excludes are set
         return 0;
     }
 
