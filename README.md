@@ -19,7 +19,7 @@ Unlike traditional rootkits that rely on direct syscall table hooking or exporte
 
 `mod-rootkit` is a Loadable Kernel Module (LKM) that demonstrates basic rootkit techniques in Linux. Once inserted into the kernel, it provides stealth capabilities by intercepting and modifying system behavior to:
 
-- **Process Hiding** – Hide any process whose name matches configured keywords
+- **Process Hiding** – Hide any process based on configured keywords (that appear in the cmdline)
 - **File & Directory Hiding** – Hide files and folders based on configured keywords
 - **Network connection hiding** – Hide files and folders based on configured IP addresses or ports
 - **Module Hiding** – Hides itself from kernel module listings
