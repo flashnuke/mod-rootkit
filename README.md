@@ -59,7 +59,8 @@ make STRING_EXCLUDES="SOME_FILENAME1,SOME_FILENAME2" NET_EXCLUDES="127.0.0.1,222
 | `MODULE_NAME`    | No        | Default is `mod_rootkit`, override to change the module name                |
 
 Notes
-* To hide a process, make sure its cmdline contains a substr that is then passed via `STRING_EXCLUDES`, ie: running "`./HIDEME.sh`" and then passing `make ... STRING_EXCLUDES=HIDEME ...`
+* When hiding a process - make sure its cmdline contains a substr that is then passed via `STRING_EXCLUDES`, ie: running "`./HIDEME.sh`" and then passing `make ... STRING_EXCLUDES=HIDEME ...`
+* For every str inside the `*_EXCLUDES` params, it's enough for a partial match in order for an entry to be hidden (doesn't have to be a full match, i.e: `STRING_EXCLUDES=ABC` would hide entry `...ABCDE...`)
 * Setting `HIDE_MODULE=1` hides the module, use with caution as it's not trivial to remove it afterwards
 * `NET_EXCLUDES` example - `NET_EXCLUDES=127.0.0.1,12345` would exclude all connections to/from `127.0.0.1` and all connections to/from port `12345`
 
