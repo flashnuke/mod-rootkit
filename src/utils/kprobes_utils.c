@@ -1,4 +1,4 @@
-#include "utils/kprobe_utils.h"
+#include "utils/kprobes_utils.h"
 
 // Function to retrieve kallsyms_lookup_name using kprobes
 kallsyms_lookup_name_t _kallsyms_lookup(void) {
