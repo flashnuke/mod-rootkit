@@ -1,5 +1,9 @@
 #include "utils/excludes/ip_filtering.h"
 
+int net_exclusions_are_set() {
+    return NET_EXCLUDES[0] == '\0';
+}
+
 void ip_to_hex(const char *ip_str, char *hex_buf) {
     u32 ip = in_aton(ip_str);
     sprintf(hex_buf, "%02X%02X%02X%02X",
@@ -14,7 +18,7 @@ void port_to_hex(unsigned int port, char *hex_buf) {
 }
 
 int should_exclude_line(const char *line) {
-    if (NET_EXCLUDES[0] == '\0') { // NET_EXCLUDES WAS NOT SET
+    if (!net_excludes_are_set()) { // NET_EXCLUDES WAS NOT SET
         return 0;
     } 
 
