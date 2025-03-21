@@ -11,7 +11,7 @@
 
 A simple proof-of-concept Linux Kernel Rootkit module designed to hide processes, files, and itself from userland visibility for modern kernel versions.  
 
-This module operates at the kernel level, allowing it to intercept system calls directly, enabling a higher degree of stealth compared to user-space techniques (i.e `LDPRELOAD`).
+This module operates at the kernel level, allowing it to intercept system calls directly, enabling a higher degree of stealth compared to user-space techniques (i.e `LD_PRELOAD`).
 
 Unlike traditional rootkits that rely on direct syscall table hooking or exported symbols like kallsyms_lookup_name(), this implementation leverages kprobes and ftrace (credit goes to [xcellerator](https://github.com/xcellerator/linux_kernel_hacking) for this method) — for greater stealth and compatibility. It avoids deprecated or removed interfaces, ensuring operability on recent kernel versions (e.g., 5.7+ where kallsyms_lookup_name() is no longer exported).
 
@@ -19,7 +19,7 @@ Unlike traditional rootkits that rely on direct syscall table hooking or exporte
 
 `mod-rootkit` is a Loadable Kernel Module (LKM) that demonstrates basic rootkit techniques in Linux. Once inserted into the kernel, it provides stealth capabilities by intercepting and modifying system behavior to:
 
-- **Process Hiding** – Hide any process whose name matches configured keywords
+- **Process Hiding** – Hide any process based on configured keywords (that appear in the cmdline)
 - **File & Directory Hiding** – Hide files and folders based on configured keywords
 - **Network connection hiding** – Hide files and folders based on configured IP addresses or ports
 - **Module Hiding** – Hides itself from kernel module listings
