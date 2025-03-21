@@ -24,6 +24,11 @@ Unlike traditional rootkits that rely on direct syscall table hooking or exporte
 - **Network connection hiding** – Hide files and folders based on configured IP addresses or ports
 - **Module Hiding** – Hides itself from kernel module listings
 
+Demo - before and after loading the module:
+
+<img width="446" alt="image" src="https://github.com/user-attachments/assets/391053e8-06c7-47aa-9301-043b5590e619" />
+
+
 ## Requirements
 
 - Linux system with kernel headers installed
