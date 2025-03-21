@@ -1,6 +1,6 @@
 #include "utils/excludes/ip_filtering.h"
 
-int net_exclusions_are_set() {
+int net_exclusions_are_empty() {
     return NET_EXCLUDES[0] == '\0';
 }
 
@@ -18,7 +18,7 @@ void port_to_hex(unsigned int port, char *hex_buf) {
 }
 
 int should_exclude_line(const char *line) {
-    if (!net_exclusions_are_set()) { // NET_EXCLUDES WAS NOT SET
+    if (net_exclusions_are_empty()) { // NET_EXCLUDES WAS NOT SET
         return 0;
     } 
 
