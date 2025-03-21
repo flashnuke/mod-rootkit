@@ -6,7 +6,7 @@
 #include <linux/module.h>
 #include <linux/ptrace.h>
 #include <linux/kallsyms.h>
-#include "kprobe_utils.h"
+#include "kprobes_utils.h"
 
 // Prevent recursive loops when hooking
 #define USE_FENTRY_OFFSET 0
