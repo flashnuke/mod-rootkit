@@ -61,6 +61,7 @@ make STRING_EXCLUDES="SOME_FILENAME1,SOME_FILENAME2" NET_EXCLUDES="127.0.0.1,222
 Notes
 * To hide a process, make sure its cmdline contains a substr that is then passed via `STRING_EXCLUDES`, ie: running "`./HIDEME.sh`" and then passing `make ... STRING_EXCLUDES=HIDEME ...`
 * Setting `HIDE_MODULE=1` hides the module, use with caution as it's not trivial to remove it afterwards
+* `NET_EXCLUDES` example - `NET_EXCLUDES=127.0.0.1,12345` would exclude all connections to/from `127.0.0.1` and all connections to/from port `12345`
 
 ### Loading / removing the module manually
 To load:
