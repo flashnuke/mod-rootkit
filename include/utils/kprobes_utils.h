@@ -3,10 +3,9 @@
 
 #include <linux/kprobes.h>
 
-// Typedef for kallsyms_lookup_name function pointer
+// typedef for kallsyms_lookup_name func ptr
 typedef unsigned long (*kallsyms_lookup_name_t)(const char *name);
 
-// Function declaration (use extern since it is defined in `kprobe_utils.c`)
 extern kallsyms_lookup_name_t _kallsyms_lookup(void);
 
 #endif // KPROBES_UTILS_H
