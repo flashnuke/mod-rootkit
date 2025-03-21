@@ -1,6 +1,6 @@
 #include <linux/file.h>
 
-#include "utils/excludes/ip_filtering.h"
+#include "utils/excludes/net_filtering.h"
 #include "utils/ftrace_utils.h"
 #include "hooks/x64_sys_read.h"
 

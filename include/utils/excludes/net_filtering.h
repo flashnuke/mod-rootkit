@@ -5,7 +5,7 @@
 #include <linux/inet.h>
 #include <linux/string.h>
 
-extern int net_exclusions_are_empty();
+extern int net_exclusions_are_empty(void);
 extern void ip_to_hex(const char *ip_str, char *hex_buf);
 extern void port_to_hex(unsigned int port, char *hex_buf);
 extern int should_exclude_line(const char *line);

