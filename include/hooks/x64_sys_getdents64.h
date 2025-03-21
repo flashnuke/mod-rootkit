@@ -7,9 +7,7 @@
 #include <linux/uaccess.h>
 #include <linux/string.h>
 #include <linux/kstrtox.h>
-#include <linux/mm.h>
 #include <linux/sched/task.h>
-#include <linux/printk.h>
 #include <linux/version.h>
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,17,0)
