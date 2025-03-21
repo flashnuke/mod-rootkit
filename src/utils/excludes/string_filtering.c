@@ -9,7 +9,7 @@ int strings_exclusions_are_empty() {
 }
 
 int str_entry_is_excluded(const char *entry) {
-    if (strings_exclusions_are_empty()) { // no string excludes are set
+    if (strings_exclusions_are_empty()) { // no string excludes were set
         return 0;
     }
 
