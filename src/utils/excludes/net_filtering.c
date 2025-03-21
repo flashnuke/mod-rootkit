@@ -18,7 +18,7 @@ void port_to_hex(unsigned int port, char *hex_buf) {
 }
 
 int should_exclude_line(const char *line) {
-    if (!net_excludes_are_set()) { // NET_EXCLUDES WAS NOT SET
+    if (!net_exclusions_are_set()) { // NET_EXCLUDES WAS NOT SET
         return 0;
     } 
 
