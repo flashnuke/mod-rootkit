@@ -9,7 +9,7 @@
 ```
 
 
-A simple proof-of-concept Linux Kernel Rootkit module designed to hide processes, files, and itself from userland visibility for modern kernel versions.  
+A simple proof-of-concept Linux Kernel Rootkit module designed to hide processes, files, network connections and itself from userland visibility for modern kernel versions.  
 
 This module operates at the kernel level, allowing it to intercept system calls directly, enabling a higher degree of stealth compared to user-space techniques (i.e `LD_PRELOAD`).
 
