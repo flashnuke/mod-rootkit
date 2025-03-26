@@ -28,7 +28,6 @@ void stop_tasks(k_task* tasks, size_t count) {
             kthread_stop(task_thread);
             tasks[i]->task_thread = NULL;
         }
-
     }
 }
 

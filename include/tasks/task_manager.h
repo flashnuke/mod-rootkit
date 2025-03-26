@@ -10,9 +10,11 @@ typedef int (*task_ptr)(void);
 
 // Structure representing a task
 struct k_task {
-    task_ptr* task_func_ptr;
+    task_ptr task_func_ptr;
     struct task_struct* task_thread;
 };
 
+extern int run_tasks(k_task* tasks, size_t count);
+extern void stop_tasks(k_task* tasks, size_t count);
 
 #endif // TASK_MANAGER_H

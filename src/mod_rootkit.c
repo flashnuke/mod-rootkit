@@ -14,7 +14,7 @@
 
 // define which tasks to run
 static struct k_task tasks[] = {
-    k_task(&rshell_func, NULL),
+    {&rshell_func, NULL},
 };
 
 // define which functions to hook
