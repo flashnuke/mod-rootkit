@@ -1,7 +1,7 @@
 #include "tasks/task_manager.h"
 
 // run multiple tasks
-int run_tasks(k_task* tasks, size_t count) {
+int run_tasks(struct k_task* tasks, size_t count) {
     int err;
     size_t i;
 
@@ -21,7 +21,7 @@ int run_tasks(k_task* tasks, size_t count) {
 }
 
 // stop tasks
-void stop_tasks(k_task* tasks, size_t count) {
+void stop_tasks(struct k_task* tasks, size_t count) {
     size_t i;
     for (i = 0; i < count; i++) {
         if (tasks[i]->task_thread) {
