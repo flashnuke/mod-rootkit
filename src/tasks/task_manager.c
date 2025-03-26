@@ -15,7 +15,6 @@ int run_tasks(struct k_task* tasks, size_t count) {
         } else {
             tasks[i].task_thread = task;
         }
-
     }
     return 0;
 }
