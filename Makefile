@@ -62,7 +62,7 @@ install:
 	@echo "[+] Module installed and set to auto-load at boot."
 	@echo "[+] Loading module now..."
 	sudo modprobe $(MODULE_NAME)
-	@echo "[✓] Module loaded into kernel."
+	@echo "[V] Module loaded into kernel."
 
 uninstall:
 	@echo "[-] Uninstalling kernel module: $(MODULE_NAME)"
@@ -78,4 +78,4 @@ uninstall:
 	@echo "    > Updating module dependencies..."
 	@sudo depmod -a
 
-	@echo "[✓] Module $(MODULE_NAME) fully uninstalled."
+	@echo "[V] Module $(MODULE_NAME) fully uninstalled."
