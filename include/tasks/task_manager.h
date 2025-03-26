@@ -1,6 +1,8 @@
 #ifndef TASK_MANAGER_H
 #define TASK_MANAGER_H
 
+#include <linux/types.h> // for size_t
+
 typedef int (*task_ptr)(void* data);
 
 // Structure representing a task
