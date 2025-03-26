@@ -1,9 +1,6 @@
 #ifndef TASK_MANAGER_H
 #define TASK_MANAGER_H
 
-#include <linux/delay.h>
-#include <linux/sched/signal.h>
-
 typedef int (*task_ptr)(void* data);
 
 // Structure representing a task
