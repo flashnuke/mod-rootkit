@@ -10,7 +10,7 @@ int run_tasks(struct k_task* tasks, size_t count) {
         sprintf(task_nickname, "task_%d", i);
         struct task_struct* task = kthread_run(tasks[i].task_func_ptr, NULL, task_nickname);
 
-        if (IS_ERR(task)) {
+        if (IS_ERR(task)) { // tasks that were created will be closed in module_exit
             return err;
         } else {
             tasks[i].task_thread = task;
@@ -25,7 +25,7 @@ void stop_tasks(struct k_task* tasks, size_t count) {
     size_t i;
     for (i = 0; i < count; i++) {
         if (tasks[i].task_thread) {
-            kthread_stop(task_thread);
+            kthread_stop(tasks[i].task_thread);
             tasks[i].task_thread = NULL;
         }
     }
