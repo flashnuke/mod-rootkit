@@ -5,7 +5,6 @@
 #include <linux/delay.h>
 #include <linux/sched/signal.h>
 
-
 typedef int (*task_ptr)(void);
 
 // Structure representing a task
