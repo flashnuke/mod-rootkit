@@ -16,4 +16,3 @@ extern asmlinkage int hook_read(const struct pt_regs *regs);
 extern long hook_read_impl(unsigned int fd, char __user *buf, long ret);
 
 #endif // READ_HOOK_H
-
