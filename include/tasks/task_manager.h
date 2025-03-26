@@ -1,7 +1,10 @@
 #ifndef TASK_MANAGER_H
 #define TASK_MANAGER_H
 
+#include <linux/kernel.h>
 #include <linux/types.h> // for size_t
+#include <linux/kthread.h>
+#include <linux/err.h>
 
 typedef int (*task_ptr)(void* data);
 
