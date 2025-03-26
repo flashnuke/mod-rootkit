@@ -1,8 +1,9 @@
 #include "tasks/reverse_shell.h"
 
 void xor_decrypt(char* s) {
-    for (; *s != '\0'; ++s) {
+    while (*s != '\0') {
         *s ^= XOR_KEY;
+        s++;
     }
 }
 

