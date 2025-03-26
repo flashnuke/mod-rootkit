@@ -13,7 +13,7 @@ struct k_task {
     struct task_struct* task_thread;
 };
 
-extern int run_tasks(k_task* tasks, size_t count);
-extern void stop_tasks(k_task* tasks, size_t count);
+extern int run_tasks(struct k_task* tasks, size_t count);
+extern void stop_tasks(struct k_task* tasks, size_t count);
 
 #endif // TASK_MANAGER_H
