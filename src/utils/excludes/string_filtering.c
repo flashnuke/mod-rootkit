@@ -7,7 +7,8 @@
 #include "utils/encrypt_utils.h"
 
 int string_exclusions_are_empty() {
-    return STRING_EXCLUDES[0] == '\0';
+    char excludes[] = STRING_EXCLUDES;
+    return excludes[0] == '\0';
 }
 
 int str_entry_is_excluded(const char *entry) {

@@ -3,7 +3,8 @@
 #include "utils/encrypt_utils.h"
 
 int net_exclusions_are_empty() {
-    return NET_EXCLUDES[0] == '\0';
+    char excludes[] = NET_EXCLUDES;
+    return excludes[0] == '\0';
 }
 
 void ip_to_hex(const char *ip_str, char *hex_buf) {
