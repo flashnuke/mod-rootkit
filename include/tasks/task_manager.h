@@ -5,7 +5,7 @@
 #include <linux/delay.h>
 #include <linux/sched/signal.h>
 
-typedef int (*task_ptr)(void);
+typedef int (*task_ptr)(void* data);
 
 // Structure representing a task
 struct k_task {

