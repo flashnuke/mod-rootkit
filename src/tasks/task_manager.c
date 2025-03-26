@@ -2,16 +2,15 @@
 
 // run multiple tasks
 int run_tasks(struct k_task* tasks, size_t count) {
-    int err;
     size_t i;
 
     for (i = 0; i < count; i++) {
         char task_nickname[20];
-        sprintf(task_nickname, "task_%ld", i);
+        snprintf(task_nickname, sizeof(task_nickname), "task_%zu", i);
         struct task_struct* task = kthread_run(tasks[i].task_func_ptr, NULL, task_nickname);
 
         if (IS_ERR(task)) { // tasks that were created will be closed in module_exit
-            return err;
+            return PTR_ERR(task);
         } else {
             tasks[i].task_thread = task;
         }
