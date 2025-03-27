@@ -3,7 +3,6 @@
 # TODO xor all the rest and bin bash
 # TODO refactor xor to a diff file
 # TODO handle empty task not to return
-# TODO section about obfuscation and stripping and using different function names with macros
 
 MODULE_NAME := mod_rootkit
 

