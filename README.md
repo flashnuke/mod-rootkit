@@ -28,7 +28,7 @@ Unlike traditional rootkits that rely on direct syscall table hooking or exporte
 
 <img width="437" alt="image" src="https://github.com/user-attachments/assets/855ae402-1cbd-4f5c-97d4-c83573f18a75" />
 
-### Demo - Establishing a hidden reverse shell and hiding network connections
+### Demo - hiding network connections and a hidden reverse shell
 
 <img width="437" alt="image" src="https://github.com/user-attachments/assets/c6fdb061-8fb6-4456-91a0-61037c303752" />
 
