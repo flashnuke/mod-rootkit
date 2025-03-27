@@ -1,9 +1,3 @@
-# TODO prettify code here and comment
-# TODO test empty rshell obf
-# TODO xor all the rest and bin bash
-# TODO refactor xor to a diff file
-# TODO handle empty task not to return
-
 MODULE_NAME := mod_rootkit
 
 STRING_EXCLUDES ?=
