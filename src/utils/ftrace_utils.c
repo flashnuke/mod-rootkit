@@ -41,7 +41,7 @@ int fh_install_hook(struct ftrace_hook *hook) {
         return err;
     }
 
-    hook->ops.func = fh_ftrace_thunk;
+    hook->ops.func = (ftrace_func_t)fh_ftrace_thunk;
     hook->ops.flags = FTRACE_OPS_FL_SAVE_REGS
                       | FTRACE_OPS_FL_RECURSION_SAFE
                       | FTRACE_OPS_FL_IPMODIFY;
