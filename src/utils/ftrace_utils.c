@@ -1,5 +1,11 @@
 #include "utils/ftrace_utils.h"
 
+#ifdef FTRACE_OPS_FL_RECURSION_SAFE
+  #define D_FTRACE_RECURSION_FLAG FTRACE_OPS_FL_RECURSION_SAFE
+#else
+  #define D_FTRACE_RECURSION_FLAG FTRACE_OPS_FL_RECURSION
+#endif
+
 // Resolve the address of the function being hooked
 int fh_resolve_hook_address(struct ftrace_hook *hook) {
     kallsyms_lookup_name_t kallsyms_lookup_name = _kallsyms_lookup();
@@ -43,7 +49,7 @@ int fh_install_hook(struct ftrace_hook *hook) {
 
     hook->ops.func = (ftrace_func_t)fh_ftrace_thunk;
     hook->ops.flags = FTRACE_OPS_FL_SAVE_REGS
-                      | FTRACE_OPS_FL_RECURSION_SAFE
+                      | D_FTRACE_RECURSION_FLAG
                       | FTRACE_OPS_FL_IPMODIFY;
 
     err = ftrace_set_filter_ip(&hook->ops, hook->address, 0, 0);
