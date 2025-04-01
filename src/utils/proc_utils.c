@@ -21,8 +21,9 @@ char *read_cmdline_from_task(pid_t pid, size_t *out_size) { // reads the command
     }
     mm = get_task_mm(task);
     rcu_read_unlock();
-    if (!mm)
+    if (!mm) {
         return NULL;
+    }
 
     // lock the memory map
     down_read(&mm->mmap_lock);
@@ -45,8 +46,9 @@ char *read_cmdline_from_task(pid_t pid, size_t *out_size) { // reads the command
     }
 
     buffer[size] = '\0';  // null-terminate
-    if (out_size)
+    if (out_size) {
         *out_size = size;
-    return buffer;
+    }
+    return buffer; // memory will be freed by the calle
 }
 
