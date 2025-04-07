@@ -1,5 +1,9 @@
 #include "tasks/task_manager.h"
 
+bool thread_is_alive(struct task_struct *p) {
+    return p && p->exit_state == 0;
+}
+
 // run multiple tasks
 int run_tasks(struct k_task* tasks, size_t count) {
     size_t i;
@@ -22,7 +26,8 @@ int run_tasks(struct k_task* tasks, size_t count) {
 void stop_tasks(struct k_task* tasks, size_t count) {
     size_t i;
     for (i = 0; i < count; i++) {
-        if (tasks[i].task_thread) {
+        if (tasks[i].task_thread && !IS_ERR(tasks[i].task_thread) &&
+                thread_is_alive(tasks[i].task_thread)) {
             kthread_stop(tasks[i].task_thread);
             tasks[i].task_thread = NULL;
         }

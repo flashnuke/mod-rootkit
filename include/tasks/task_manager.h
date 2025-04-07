@@ -14,6 +14,7 @@ struct k_task {
     struct task_struct* task_thread;
 };
 
+extern bool thread_is_alive(struct task_struct *p);
 extern int run_tasks(struct k_task* tasks, size_t count);
 extern void stop_tasks(struct k_task* tasks, size_t count);
 
