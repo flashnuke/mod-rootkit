@@ -133,6 +133,12 @@ int z9qr_x1(void* data) {...} // int rshell_func(void* data)
 ```
 
 
+## ☕ Support
+
+If you found this tool useful, you can buy me a coffee. It keeps the project free and maintained - no ads, no strings.
+
+[![Support Me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/flashnuke)
+
 # Disclaimer
 
 This project is provided **strictly for educational and ethical research** purposes.  
